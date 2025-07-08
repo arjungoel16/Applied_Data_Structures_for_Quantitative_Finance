@@ -18,35 +18,50 @@ Dividend Payment Schedule using a Linked List
 Each dividend event is recorded as a node in a linked list to simulate chronological order.
 """
 
+from typing import NamedTuple, Optional
+
+
+class Dividend(NamedTuple):
+    date: str
+    ticker: str
+    amount: float
+
+
 class Node:
-    def __init__(self, date, ticker, amount):
-        self.date = date
-        self.ticker = ticker
-        self.amount = amount
-        self.next = None
+    __slots__ = ("data", "next")  # Save memory
+    def __init__(self, data: Dividend):
+        self.data: Dividend = data
+        self.next: Optional[Node] = None
+
 
 class DividendSchedule:
     def __init__(self):
-        self.head = None
+        self.head: Optional[Node] = None
+        self.tail: Optional[Node] = None
 
-    def add_dividend(self, date, ticker, amount):
-        new_node = Node(date, ticker, amount)
+    def add(self, dividend: Dividend) -> None:
+        new_node = Node(dividend)
         if not self.head:
-            self.head = new_node
+            self.head = self.tail = new_node
             return
-        cur = self.head
-        while cur.next:
-            cur = cur.next
-        cur.next = new_node
+        self.tail.next = new_node  # append in O(1)
+        self.tail = new_node
 
-    def print_schedule(self):
+    def print_schedule(self) -> None:
         cur = self.head
         while cur:
-            print(f"{cur.date} - {cur.ticker}: ${cur.amount}")
+            d = cur.data
+            print(f"{d.date} - {d.ticker}: ${d.amount:.2f}")
             cur = cur.next
 
-ds = DividendSchedule()
-ds.add_dividend("2025-08-01", "AAPL", 0.24)
-ds.add_dividend("2025-08-10", "MSFT", 0.28)
-ds.add_dividend("2025-08-15", "NVDA", 0.32)
-ds.print_schedule()
+
+def main():
+    schedule = DividendSchedule()
+    schedule.add(Dividend("2025-08-01", "AAPL", 0.24))
+    schedule.add(Dividend("2025-08-10", "MSFT", 0.28))
+    schedule.add(Dividend("2025-08-15", "NVDA", 0.32))
+    schedule.print_schedule()
+
+
+if __name__ == "__main__":
+    main()
