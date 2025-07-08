@@ -21,19 +21,40 @@ Simulates the management of a trade execution system with queues and undo stack.
 
 from collections import deque
 
-# Queue for pending trades
-trade_queue = deque(["Buy AAPL", "Sell TSLA", "Buy NVDA"])
-# Stack for undoing actions
-undo_stack = []
+from typing import NamedTuple
 
-# Process trades
-while trade_queue:
-    trade = trade_queue.popleft()
-    print("Executing:", trade)
-    undo_stack.append(trade)
 
-# Undo last two actions
-print("Undoing:")
-for _ in range(2):
-    if undo_stack:
-        print("Reverting:", undo_stack.pop())
+class Trade(NamedTuple):
+    action: str
+    symbol: str
+
+
+def execute_trade_queue(trade_queue: deque[Trade]) -> list[Trade]:
+    undo_stack = []
+    while trade_queue:
+        trade = trade_queue.popleft()
+        print(f"Executing: {trade.action} {trade.symbol}", flush=True)
+        undo_stack.append(trade)
+    return undo_stack
+
+
+def revert_last_n(stack: list[Trade], n: int) -> None:
+    print("Undoing:")
+    for _ in range(n):
+        if stack:
+            last = stack.pop()
+            print(f"Reverting: {last.action} {last.symbol}", flush=True)
+
+
+def main():
+    trade_queue = deque([
+        Trade("Buy", "AAPL"),
+        Trade("Sell", "TSLA"),
+        Trade("Buy", "NVDA"),
+    ])
+    undo_stack = execute_trade_queue(trade_queue)
+    revert_last_n(undo_stack, 2)
+
+
+if __name__ == "__main__":
+    main()
