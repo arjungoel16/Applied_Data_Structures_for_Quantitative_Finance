@@ -1,4 +1,4 @@
-# Quantitative Finance with Python: Data Structures in Practice
+# Applied Data Structures for Quantitative Finance
 
 This repository showcases real-world applications of fundamental data structures and algorithm analysis using Python, tailored to quantitative finance and algorithmic trading contexts.
 
