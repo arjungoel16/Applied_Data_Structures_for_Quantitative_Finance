@@ -21,18 +21,37 @@ This script demonstrates how to initialize, update, and rebalance a multi-asset 
 using Python lists and basic arithmetic.
 """
 
-# Define portfolio assets and their weights
-assets = ["AAPL", "MSFT", "GOOGL", "TSLA"]
-weights = [0.25, 0.25, 0.25, 0.25]  # Equal-weighted portfolio
+from decimal import Decimal, getcontext
+from typing import NamedTuple, List
 
-# Add a new stock
-assets.append("NVDA")
-weights.append(0.2)
+getcontext().prec = 6  # Control floating point precision
 
-# Normalize weights
-total_weight = sum(weights)
-weights = [round(w / total_weight, 2) for w in weights]
+class Asset(NamedTuple):
+    symbol: str
+    weight: Decimal
 
-# Output rebalanced portfolio
-for asset, weight in zip(assets, weights):
-    print(f"{asset}: {weight*100}%")
+def normalize_weights(assets: List[Asset]) -> List[Asset]:
+    total = sum(asset.weight for asset in assets)
+    if total == 0:
+        raise ValueError("Total weight cannot be zero.")
+    return [Asset(asset.symbol, (asset.weight / total).quantize(Decimal("0.01"))) for asset in assets]
+
+def main():
+    portfolio = [
+        Asset("AAPL", Decimal("0.25")),
+        Asset("MSFT", Decimal("0.25")),
+        Asset("GOOGL", Decimal("0.25")),
+        Asset("TSLA", Decimal("0.25"))
+    ]
+
+    # Insert NVDA dynamically
+    portfolio.append(Asset("NVDA", Decimal("0.20")))
+
+    # Normalize
+    portfolio = normalize_weights(portfolio)
+
+    for asset in portfolio:
+        print(f"{asset.symbol}: {asset.weight * 100:.0f}%")
+
+if __name__ == "__main__":
+    main()
