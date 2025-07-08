@@ -19,21 +19,47 @@ Correlation Graph of Assets using NetworkX
 Models correlation relationships between stocks using an undirected graph.
 """
 
+from typing import Set, Tuple
 import networkx as nx
 import matplotlib.pyplot as plt
 
-# Define correlations > 0.8
-correlations = {
-    ("AAPL", "MSFT"),
-    ("GOOGL", "MSFT"),
-    ("TSLA", "NVDA"),
-    ("AAPL", "NVDA"),
-}
 
-G = nx.Graph()
-G.add_edges_from(correlations)
+AssetPair = Tuple[str, str]
 
-# Visualize
-nx.draw(G, with_labels=True, node_color="lightgreen", node_size=2000, font_size=10)
-plt.title("High Correlation Network")
-plt.show()
+
+def build_correlation_graph(edges: Set[AssetPair]) -> nx.Graph:
+    G = nx.Graph()
+    G.add_edges_from(edges)
+    return G
+
+
+def visualize_graph(G: nx.Graph, title: str = "Correlation Network") -> None:
+    pos = nx.spring_layout(G, seed=42)  # Deterministic layout
+    nx.draw(
+        G,
+        pos,
+        with_labels=True,
+        node_color="lightblue",
+        edge_color="gray",
+        node_size=1600,
+        font_size=10
+    )
+    plt.title(title)
+    plt.tight_layout()
+    plt.show()
+
+
+def main():
+    correlated_pairs: Set[AssetPair] = {
+        ("AAPL", "MSFT"),
+        ("GOOGL", "MSFT"),
+        ("TSLA", "NVDA"),
+        ("AAPL", "NVDA"),
+    }
+
+    graph = build_correlation_graph(correlated_pairs)
+    visualize_graph(graph)
+
+
+if __name__ == "__main__":
+    main()
